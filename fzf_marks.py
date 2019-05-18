@@ -62,8 +62,8 @@ class dfmark(Command):
             self.fm.notify("No fzf-marks is created yet!", bad=True)
             return
 
-        command = '< "{}" fzf --height 60% --reverse \
-            -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="{}" --tac'.format(
+        command = '< "{}" sort -f | fzf --height 60% \
+            -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="{}"'.format(
             mark_file, query
         )
 
@@ -108,8 +108,8 @@ class fzm(Command):
             self.fm.notify("No fzf-marks is created yet!", bad=True)
             return
 
-        command = '< "{}" fzf --height 60% --reverse \
-            +m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="{}" --select-1 --tac'.format(
+        command = '< "{}" sort -f | fzf --height 60% \
+            +m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="{}" --select-1'.format(
             mark_file, query
         )
 
