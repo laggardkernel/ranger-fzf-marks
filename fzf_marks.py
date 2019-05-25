@@ -40,9 +40,9 @@ class fmark(Command):
             self.fm.notify("** The following mark has been added **: {}".format(item))
 
 
-class dfmark(Command):
+class dmark(Command):
     """
-    dfmark: delete current directory from fzf-marks file
+    dmark: delete current directory from fzf-marks file
     """
 
     def execute(self):
