@@ -1,3 +1,6 @@
+# Copyright 2019, laggardkernel and the ranger-fzf-marks contributors
+# SPDX-License-Identifier: MIT
+
 from __future__ import absolute_import, division, print_function
 import os
 from ranger.api.commands import Command
