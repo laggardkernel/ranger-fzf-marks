@@ -10,34 +10,33 @@ class fmark(Command):
     """
 
     def execute(self):
-        from os.path import join, expanduser, exists
-        from os import makedirs, linesep
-
         if not self.arg(1):
             self.fm.notify(
                 "A keyword must be given for the current bookmark!", bad=True
             )
             return
 
-        mark_file = expanduser("~/.config/ranger/fzf-marks")
+        mark_file = os.path.join(
+            os.environ.get("HOME", os.path.expanduser("~")), ".fzf-marks"
+        )
+        mark_file = os.environ.get("FZF_MARKS_FILE", mark_file)
         item = "{} : {}".format(self.arg(1), self.fm.thisdir.path)
 
-        if not exists(mark_file):
+        if not os.path.exists(mark_file):
             with open(mark_file, "a") as f:
                 pass
 
         with open(mark_file, "r") as f:
             for line in f.readlines():
-                if line.strip() == item:
+                if line.split(":")[1].strip() == self.fm.thisdir.path:
                     self.fm.notify(
-                        "** The following mark already exists **: {}".format(item),
-                        bad=True,
+                        "Fzf bookmark already exists: {}".format(line.strip()), bad=True
                     )
                     return
 
         with open(mark_file, "a") as f:
-            f.write("{}{}".format(item, linesep))
-            self.fm.notify("** The following mark has been added **: {}".format(item))
+            f.write("{}{}".format(item, os.linesep))
+            self.fm.notify("Fzf bookmark has been added: {}".format(item))
 
 
 class dmark(Command):
@@ -47,23 +46,24 @@ class dmark(Command):
 
     def execute(self):
         import subprocess
-        from os.path import join, expanduser, exists
-        from os import linesep
-        from time import sleep
 
-        mark_file = expanduser("~/.config/ranger/fzf-marks")
+        mark_file = os.path.join(
+            os.environ.get("HOME", os.path.expanduser("~")), ".fzf-marks"
+        )
+        mark_file = os.environ.get("FZF_MARKS_FILE", mark_file)
         items = None
         query = ""
 
         if self.arg(1):
             query = self.arg(1)
 
-        if not exists(mark_file):
-            self.fm.notify("No fzf-marks is created yet!", bad=True)
+        if not os.path.exists(mark_file):
+            self.fm.notify("No fzf bookmark is created yet!", bad=True)
             return
 
-        command = '< "{}" sort -f | fzf --height 60% \
-            -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="{}"'.format(
+        # TODO: batch deletion
+        command = '< "{}" sort -f | fzf --height 62% \
+            -m --ansi --bind=ctrl-o:accept,ctrl-t:toggle --query="{}"'.format(
             mark_file, query
         )
 
@@ -85,7 +85,7 @@ class dmark(Command):
                 if line.strip() not in items:
                     f.write(line)
 
-        self.fm.notify("fmarks deleted: {}".format(", ".join(items)))
+        self.fm.notify("Fzf bookmark is deleted: {}".format(", ".join(items)))
 
 
 class fzm(Command):
@@ -95,9 +95,11 @@ class fzm(Command):
 
     def execute(self):
         import subprocess
-        import os
 
-        mark_file = os.path.expanduser("~/.config/ranger/fzf-marks")
+        mark_file = os.path.join(
+            os.environ.get("HOME", os.path.expanduser("~")), ".fzf-marks"
+        )
+        mark_file = os.environ.get("FZF_MARKS_FILE", mark_file)
         target = None
         query = ""
 
@@ -105,11 +107,11 @@ class fzm(Command):
             query = self.arg(1)
 
         if not os.path.exists(mark_file):
-            self.fm.notify("No fzf-marks is created yet!", bad=True)
+            self.fm.notify("No fzf bookmark is created yet!", bad=True)
             return
 
-        command = '< "{}" sort -f | fzf --height 60% \
-            +m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="{}" --select-1'.format(
+        command = '< "{}" sort -f | fzf --height 62% \
+            +m --ansi --bind=ctrl-o:accept,ctrl-t:toggle --query="{}" --select-1'.format(
             mark_file, query
         )
 
@@ -125,5 +127,9 @@ class fzm(Command):
             return
         elif os.path.isdir(target):
             self.fm.cd(target)
-        else:
+        elif os.path.isfile(target):
             self.fm.select_file(target)
+        else:
+            self.fm.notify(
+                "Unavailable fzf bookmark location: {} : {}".format(key, target), True
+            )
