@@ -7,14 +7,12 @@ from ranger.api.commands import Command
 
 
 class FzfMarksBase(Command):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
-        self.fzf_cmd = os.environ.get("FZF_MARKS_CMD", "fzf")
-        # https://github.com/urbainvaes/fzf-marks
-        self.bookmark_file = os.environ.get("FZF_MARKS_FILE") or os.path.join(
-            os.environ.get("HOME", os.path.expanduser("~")), ".fzf-marks"
-        )
+    fzf_cmd = os.environ.get("FZF_MARKS_CMD", "fzf")
+    # https://github.com/urbainvaes/fzf-marks
+    bookmark_file = os.environ.get("FZF_MARKS_FILE") or os.path.join(
+        os.environ.get("HOME", os.path.expanduser("~")), ".fzf-marks"
+    )
 
 
 class fmark(FzfMarksBase):
@@ -54,12 +52,10 @@ class dmark(FzfMarksBase):
     dmark: delete current directory from fzf-marks file
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fzf_opts = os.environ.get(
-            "FZF_DMARK_OPTS",
-            "--cycle -m --ansi --bind=ctrl-o:accept,ctrl-t:toggle",
-        )
+    fzf_opts = os.environ.get(
+        "FZF_DMARK_OPTS",
+        "--cycle -m --ansi --bind=ctrl-o:accept,ctrl-t:toggle",
+    )
 
     def execute(self):
         import subprocess
@@ -105,12 +101,10 @@ class fzm(FzfMarksBase):
     fzm: select and jump to bookmark stored in fzf-marks
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fzf_opts = os.environ.get(
-            "FZF_FZM_OPTS",
-            "--cycle +m --ansi --bind=ctrl-o:accept,ctrl-t:toggle --select-1",
-        )
+    fzf_opts = os.environ.get(
+        "FZF_FZM_OPTS",
+        "--cycle +m --ansi --bind=ctrl-o:accept,ctrl-t:toggle --select-1",
+    )
 
     def execute(self):
         import subprocess
